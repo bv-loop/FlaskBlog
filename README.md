@@ -8,6 +8,7 @@
 * Passwords are securely encoded with hashing and salting methods.
 * Only Admin users can create and delete posts.
 * Users can get in contact with the the owner(me) regarding any enquiries and see what the owner is about.
+* The App makes use of CKeditor (for creating posts and comments); a WYSIWYG rich text editor which enables writing content directly inside of web pages or online applications.
 * (Production) WSGI server is setup with Gunicorn to run the Live Python Application on Heroku. PostgreSQL database is used for production.
 * (Development) Development and testing is done locally with a SQLite database.
 
