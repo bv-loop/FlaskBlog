@@ -1,31 +1,40 @@
 {% include "header.html" %}
 
-  <!-- Page Header -->
-  <header class="masthead" style="background-image: url({{ url_for('static', filename='img/about-bg.jpg')}})">
-    <div class="overlay"></div>
-    <div class="container">
-      <div class="row">
-        <div class="col-lg-8 col-md-10 mx-auto">
-          <div class="page-heading">
-            <h1>About Me</h1>
-            <span class="subheading">This is what I do.</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </header>
-
-  <!-- Main Content -->
+<!-- Page Header -->
+<header class="masthead" style="background-image: url({{ url_for('static', filename='img/about-bg.jpg')}})">
+  <div class="overlay"></div>
   <div class="container">
     <div class="row">
       <div class="col-lg-8 col-md-10 mx-auto">
-        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Saepe nostrum ullam eveniet pariatur voluptates odit, fuga atque ea nobis sit soluta odio, adipisci quas excepturi maxime quae totam ducimus consectetur?</p>
-        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eius praesentium recusandae illo eaque architecto error, repellendus iusto reprehenderit, doloribus, minus sunt. Numquam at quae voluptatum in officia voluptas voluptatibus, minus!</p>
-        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aut consequuntur magnam, excepturi aliquid ex itaque esse est vero natus quae optio aperiam soluta voluptatibus corporis atque iste neque sit tempora!</p>
+        <div class="page-heading">
+          <h1>About Me</h1>
+          <span class="subheading">This is what I do.</span>
+        </div>
       </div>
     </div>
   </div>
+</header>
 
-  <hr>
+<!-- Main Content -->
+<div class="container">
+  <div class="row text-center">
+    <div class="col-lg-8 col-md-10 mx-auto">
+      <img class="img-fluid col-lg-5 col-md-6 col-sm-6 col-6" id='profile-pic' src="{{url_for('static', filename = 'img/bart.jpg')}}" alt="profile_pic-img">
+      <p>Hey, I'm Bart.</p>
+      <p>I'm a registered Chartered Accountant and Tech Enthusiast.</p>
+      <p>From a young age I've always been intrigued about computer science and technology. After school I obtained both
+        Bachelors and Honours degreegs in Accounting, after which I gained invaluable experience as an auditor for the
+        next 4 and a half years of my life.</p>
+      <p>I've always been interested in automating workflows for finanace related obstacles . When I'm not spending time
+        with family or friends, I navigate towards doing research and playing around with code on the computer. See some
+        of the project's I've completed in my <a href="https://github.com/bv-loop?tab=repositories">GitHub repo</a>.</p>
+      <p>Feel free to <a href="{{ url_for('contact') }}">get in touch</a> if you would like to colloborate with me in
+        the
+        future.</p>
+    </div>
+  </div>
+</div>
 
-  {% include "footer.html" %}
+<hr>
+
+{% include "footer.html" %}
