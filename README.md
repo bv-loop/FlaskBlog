@@ -5,7 +5,8 @@
 
 ## Functionality
 * Users need to register/login in order to comment on posts.
-* Passwords are securely encoded with hashing and salting methods.
+* Passwords are securely encoded with hashing and salting functions of the werkzeug.security package.
+* User authentication is done with a flask_login object
 * Only Admin users can create and delete posts.
 * Users can get in contact with the the owner(me) by sending a message, which gets transferred via email over a SMTP client session object.
 * The App makes use of CKEditor (for creating posts and comments); a WYSIWYG rich text editor which enables writing content directly inside of web pages/online applications.
