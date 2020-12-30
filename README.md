@@ -1,6 +1,6 @@
 # My Personal Blog Website.
 * https://bart-blog.herokuapp.com/
-* An End-to-End application, managed from development through to production.
+* An End-to-End application, managed from development through deployment to production.
 
 
 ## Functionality
