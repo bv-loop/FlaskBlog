@@ -1,6 +1,6 @@
 # My Personal Blog Website.
 * https://bart-blog.herokuapp.com/
-* An end to end application, managed from development thrrough to production.
+* An End-to-End application, managed from development through to production.
 
 
 ## Functionality
@@ -14,7 +14,7 @@
 ## Topics covered
 
 * Python, HTML, CSS, Heroku, SQL
-* Flask Web framework 
+* Flask Web Framework 
 * SQL Databases
 * Decorators
 * OOP
