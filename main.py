@@ -1,3 +1,7 @@
+###################################################
+######IMPORTING PACKAGES#######
+###################################################
+
 from flask import Flask, render_template, redirect, url_for, flash, request, abort
 from flask_bootstrap import Bootstrap
 from flask_ckeditor import CKEditor
@@ -10,29 +14,40 @@ from forms import CreatePostForm, RegisterForm, LoginForm, CommentForm
 from flask_gravatar import Gravatar
 from functools import wraps
 import os
+import smtplib
 
+###################################################
+######CREATING AND CONFIGURING THE FLASK APP#######
+###################################################
+
+#SETUP THE FLASK APP
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get("SECRET_KEY")
 ckeditor = CKEditor(app)
 Bootstrap(app)
 gravatar = Gravatar(app, size=100, rating='g', default='retro', force_default=False, force_lower=False, use_ssl=False, base_url=None)
+#EMAIL CREDENTIALS
+OWN_EMAIL = os.environ.get("EMAIL_ADDRESS")
+OWN_PASSWORD = os.environ.get("EMAIL_PASSWORD")
 
-##CONNECT TO DB
+##CONNECT TO DB / CONFIGURING THE APP
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DATABASE_URL")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
 
-#CONFIGURE FLASK LOG IN
+#CONFIGURE FLASK LOG IN MANAGER
 login_manager = LoginManager()
 login_manager.init_app(app)
 
 
+#LOGIN MANAGER FUNCTION TO RETURN THE CURRENT ACTIVE USER OBJECT
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-#Creating a new wrapper function / Decorator for admin only
+
+#CREATING A NEW WRAPPER FUNCTION/ DECORATOR FOR ADMIN ONLY
 def admin_only(f):
     @wraps(f)
     def decorated_func(*args, **kwargs):
@@ -42,8 +57,11 @@ def admin_only(f):
     return decorated_func
 
 
-##CONFIGURE TABLES
+###################################################
+######CONFIGURE TABLES FOR DATABASE#######
+###################################################
 
+#USER TABLE
 class User(UserMixin, db.Model):
     __tablename__ = "users"
     id = db.Column(db.Integer, primary_key=True)
@@ -58,6 +76,7 @@ class User(UserMixin, db.Model):
     comments = relationship("Comment", back_populates="comment_author")
 
 
+#BLOG POSTS TABLE
 class BlogPost(db.Model):
     __tablename__ = "blog_posts"
     id = db.Column(db.Integer, primary_key=True)
@@ -76,6 +95,7 @@ class BlogPost(db.Model):
     img_url = db.Column(db.String(250), nullable=False)
 
 
+#COMMENTS TABLE
 class Comment(db.Model):
     __tablename__= "comments"
     id = db.Column(db.Integer, primary_key = True)
@@ -89,12 +109,19 @@ class Comment(db.Model):
     post_id = db.Column(db.Integer, db.ForeignKey("blog_posts.id"))
     parent_post = relationship("BlogPost", back_populates="comments")
 
+
+###################################################
+######ROUTES AND FUNCTIONS FOR THE WEBSITE#######
+###################################################
+
+#HOME PAGE ROUTE AND PAGE
 @app.route('/')
 def get_all_posts():
     posts = BlogPost.query.all()
     return render_template("index.html", all_posts=posts, current_user = current_user)
 
 
+#REGISTER ROUTE AND PAGE
 @app.route('/register', methods=["GET", "POST"])
 def register():
     form = RegisterForm()
@@ -123,6 +150,7 @@ def register():
     return render_template("register.html", form = form, current_user = current_user)
 
 
+#LOGIN ROUTE AND PAGE
 @app.route('/login', methods=["GET", "POST"])
 def login():
     form = LoginForm()
@@ -142,12 +170,14 @@ def login():
     return render_template("login.html", form = form, current_user = current_user)
 
 
+#LOGOUT FUNCTION, REDIRECT TO HOMEPAGE
 @app.route('/logout')
 def logout():
     logout_user()
     return redirect(url_for('get_all_posts'))
 
 
+#ROUTE FOR DISPLAYING A POST
 @app.route("/post/<int:post_id>", methods=["GET", "POST"])
 def show_post(post_id):
     requested_post = BlogPost.query.get(post_id)
@@ -166,16 +196,37 @@ def show_post(post_id):
     return render_template("post.html", form = form, post=requested_post, current_user = current_user)
 
 
+#ROUTE FOR ABOUT PAGE
 @app.route("/about")
 def about():
     return render_template("about.html", current_user = current_user)
 
 
-@app.route("/contact")
+#ROUTE FOR CONTACT PAGE
+@app.route("/contact",  methods=["GET","POST"])
 def contact():
-    return render_template("contact.html", current_user = current_user)
+    if request.method=="POST":
+        data = request.form
+        send_email(data['name'],data['email'],data['phone'],data['message'])
+        return render_template('contact.html', msg_sent = True)
+    return render_template("contact.html", current_user = current_user, msg_sent = False)
 
 
+#FUNCTION TO SEND EMAILS TO OWNER
+def send_email(name, email, phone, message):
+    email_message = f"Subject:New Blog Message\n\nName: {name}\nEmail: {email}\nPhone: {phone}\nMessage: {message}"
+    OWN_EMAIL = os.environ.get("EMAIL_ADDRESS")
+    OWN_PASSWORD = os.environ.get("EMAIL_PASSWORD")
+    RECIPIENT_EMAIL = os.environ.get("RECIPIENT_EMAIL")
+    SMTP_HOST = os.environ.get("SMTP_HOST")
+    SMTP_PORT = int(os.environ.get("SMTP_PORT"))
+    with smtplib.SMTP(host = SMTP_HOST, port=SMTP_PORT) as connection:
+        connection.starttls()
+        connection.login(OWN_EMAIL, OWN_PASSWORD)
+        connection.sendmail(from_addr=OWN_EMAIL, to_addrs=RECIPIENT_EMAIL, msg= email_message)
+
+
+#ROUTE TO CREATE A NEW POST, REDIRECT TO HOMEPAGE
 @app.route("/new-post", methods=["GET", "POST"])
 @admin_only
 def add_new_post():
@@ -195,6 +246,7 @@ def add_new_post():
     return render_template("make-post.html", form=form, current_user = current_user)
 
 
+#ROUTE TO EDIT POST AND RENDER UPDATED POST
 @app.route("/edit-post/<int:post_id>", methods=["GET", "POST"])
 @admin_only
 def edit_post(post_id):
@@ -217,6 +269,7 @@ def edit_post(post_id):
     return render_template("make-post.html", form=edit_form, is_edit = True, current_user = current_user)
 
 
+#ROUTE TO DELETE POSTS
 @app.route("/delete/<int:post_id>")
 @admin_only
 def delete_post(post_id):
@@ -225,6 +278,16 @@ def delete_post(post_id):
     db.session.commit()
     return redirect(url_for('get_all_posts'))
 
+
+#CONTEXT PROCESSER TO INJECT CURRENT YEAR INTO THE FOOTER TEMPLATE
+@app.context_processor
+def inject_date():
+    return {'year': date.today().strftime("%Y") }
+
+
+###################################################
+#RUN SCRIPT
+###################################################
 
 if __name__ == "__main__":
     app.run(host = '0.0.0.0', port = 5000)
