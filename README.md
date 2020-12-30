@@ -7,8 +7,8 @@
 * Users need to register/login in order to comment on posts.
 * Passwords are securely encoded with hashing and salting methods.
 * Only Admin users can create and delete posts.
-* Users can get in contact with the the owner(me) regarding any enquiries and see what the owner is about.
-* The App makes use of CKeditor (for creating posts and comments); a WYSIWYG rich text editor which enables writing content directly inside of web pages/online applications.
+* Users can get in contact with the the owner(me) by sending a message, which gets transferred via email over a SMTP client session object.
+* The App makes use of CKEditor (for creating posts and comments); a WYSIWYG rich text editor which enables writing content directly inside of web pages/online applications.
 * (Production) WSGI server is setup with Gunicorn to run the Live Python Application on Heroku. PostgreSQL database is used for production.
 * (Development) Development and testing is done locally with a SQLite database.
 
